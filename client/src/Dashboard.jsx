@@ -18,7 +18,7 @@ export default function Dashboard() {
 
     const loadProjects = async () => {
         try {
-            const response = await fetch('http://localhost:3456/api/projects', {
+            const response = await fetch('/api/projects', {
                 headers: {
                     'Authorization': `Bearer ${getToken()}`
                 }
@@ -45,7 +45,7 @@ export default function Dashboard() {
         }
 
         try {
-            const response = await fetch('http://localhost:3456/api/projects', {
+            const response = await fetch('/api/projects', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export default function Dashboard() {
         if (!confirm('Are you sure you want to delete this project?')) return;
 
         try {
-            const response = await fetch(`http://localhost:3456/api/projects/${projectId}`, {
+            const response = await fetch(`/api/projects/${projectId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${getToken()}`

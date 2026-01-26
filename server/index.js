@@ -285,9 +285,14 @@ app.delete('/api/replies/:id', authenticate, async (req, res) => {
 // ===== PROXY ROUTE =====
 app.get('/proxy', handleProxy);
 
-const server = app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// Export app for Vercel
+module.exports = app;
+
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
 
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);

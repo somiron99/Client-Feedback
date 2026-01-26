@@ -68,7 +68,7 @@ export default function Canvas() {
 
     const loadProject = async () => {
         try {
-            const res = await fetch(`http://localhost:3456/api/projects/${id}`);
+            const res = await fetch(`/api/projects/${id}`);
             const data = await res.json();
             setProject(data);
         } catch (err) {
@@ -80,7 +80,7 @@ export default function Canvas() {
 
     const loadComments = async () => {
         try {
-            const res = await fetch(`http://localhost:3456/api/comments?projectId=${id}`);
+            const res = await fetch(`/api/comments?projectId=${id}`);
             const data = await res.json();
             setComments(data);
         } catch (err) {
@@ -90,7 +90,7 @@ export default function Canvas() {
 
     const loadReplies = async (commentId) => {
         try {
-            const res = await fetch(`http://localhost:3456/api/replies?commentId=${commentId}`);
+            const res = await fetch(`/api/replies?commentId=${commentId}`);
             const data = await res.json();
             setReplies(prev => ({ ...prev, [commentId]: data }));
         } catch (err) {
@@ -112,7 +112,7 @@ export default function Canvas() {
         if (!editText.trim()) return;
 
         try {
-            const res = await fetch(`http://localhost:3456/api/comments/${editingCommentId}`, {
+            const res = await fetch(`/api/comments/${editingCommentId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export default function Canvas() {
         if (!confirm('Are you sure you want to delete this comment?')) return;
 
         try {
-            const res = await fetch(`http://localhost:3456/api/comments/${commentId}`, {
+            const res = await fetch(`/api/comments/${commentId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${getToken()}`
@@ -165,7 +165,7 @@ export default function Canvas() {
         if (!replyText.trim() || !selectedComment) return;
 
         try {
-            const res = await fetch('http://localhost:3456/api/replies', {
+            const res = await fetch('/api/replies', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -552,7 +552,7 @@ export default function Canvas() {
                     >
                         <iframe
                             ref={iframeRef}
-                            src={`http://localhost:3456/proxy?url=${encodeURIComponent(project.url)}&projectId=${id}`}
+                            src={`/proxy?url=${encodeURIComponent(project.url)}&projectId=${id}`}
                             className="w-full h-full border-0"
                             title="Website Viewer"
                             sandbox="allow-scripts allow-forms allow-same-origin allow-popups allow-modals"

@@ -50,14 +50,18 @@ async function handleProxy(req, res) {
             }
 
             // Inject our embed script
-            // We pass the projectId and the proxyUrl base so the script knows where to talk to
-            const scriptUrl = `http://localhost:3456/embed.js`;
+            // Use the current host to determine the server URL
+            const protocol = req.headers['x-forwarded-proto'] || 'http';
+            const host = req.headers.host;
+            const serverUrl = `${protocol}://${host}`;
+            const scriptUrl = `${serverUrl}/embed.js`;
+
             // We can also inject some global config
             $('body').append(`
             <script>
                 window.PASTEL_CONFIG = {
                     projectId: "${projectId}",
-                    serverUrl: "http://localhost:3456"
+                    serverUrl: "${serverUrl}"
                 };
             </script>
             <script src="${scriptUrl}"></script>
