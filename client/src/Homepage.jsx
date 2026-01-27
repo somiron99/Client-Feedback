@@ -124,8 +124,8 @@ export default function Homepage() {
                         <div className="glass rounded-[3rem] p-4 shadow-3xl shadow-[#4B2182]/20 relative max-w-5xl mx-auto">
                             <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden aspect-[16/10] relative group shadow-inner">
                                 <img
-                                    src="/mockup.jpg"
-                                    alt="ChronoTask Website Mockup"
+                                    src="/assets/hero.gif"
+                                    alt="FlexyPin Interaction Demo"
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[4000ms]"
                                 />
                                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
