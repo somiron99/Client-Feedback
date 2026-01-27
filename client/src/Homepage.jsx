@@ -121,26 +121,41 @@ export default function Homepage() {
 
                     {/* Dashboard Preview */}
                     <div className="mt-24 relative animate-slide-up [animation-delay:400ms]">
-                        <div className="glass rounded-[3rem] p-4 shadow-3xl shadow-gray-200/50 relative">
-                            <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden aspect-[16/9] relative group">
+                        <div className="glass rounded-[3rem] p-4 shadow-3xl shadow-[#4B2182]/20 relative max-w-5xl mx-auto">
+                            <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden aspect-[16/10] relative group shadow-inner">
                                 <img
-                                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=2426"
-                                    alt="FlexyPin Platform"
-                                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-1000"
+                                    src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&q=80&w=2426"
+                                    alt="FlexyPin Platform on Laptop"
+                                    className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-[2000ms]"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+                                <div className="absolute inset-0 bg-gradient-to-tr from-[#4B2182]/30 via-transparent to-transparent"></div>
 
-                                {/* Overlay Markers Simulation */}
-                                <div className="absolute top-1/4 left-1/3 w-10 h-10 bg-[#F58220] rounded-xl flex items-center justify-center text-white font-black shadow-2xl animate-bounce">1</div>
-                                <div className="absolute top-1/2 left-2/3 w-10 h-10 bg-[#4B2182] rounded-xl flex items-center justify-center text-white font-black shadow-2xl animate-pulse">2</div>
+                                {/* Simulated Interaction Pins */}
+                                <div className="absolute top-[30%] left-[25%] flex flex-col items-center">
+                                    <div className="w-12 h-12 bg-[#F58220] rounded-2xl flex items-center justify-center text-white font-black shadow-[0_0_30px_rgba(245,130,32,0.6)] animate-bounce text-lg cursor-pointer hover:scale-110 transition-transform">1</div>
+                                    <div className="mt-4 glass-dark p-4 rounded-2xl backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 max-w-[200px] text-left">
+                                        <p className="text-[10px] text-white font-medium">"Change this heading to something more energetic!"</p>
+                                    </div>
+                                </div>
 
-                                <div className="absolute bottom-10 left-10 text-left">
-                                    <div className="glass-dark p-6 rounded-3xl max-w-sm">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-4 h-4 rounded-full bg-[#F58220]"></div>
-                                            <span className="text-[10px] font-black text-white tracking-widest uppercase">Comment Active</span>
-                                        </div>
-                                        <p className="text-white font-medium italic">"Maybe we should make the CTA button larger and use our brand orange?"</p>
+                                <div className="absolute top-[60%] right-[20%] flex flex-col items-end">
+                                    <div className="w-12 h-12 bg-[#4B2182] rounded-2xl flex items-center justify-center text-white font-black shadow-[0_0_30px_rgba(75,33,130,0.6)] animate-pulse text-lg cursor-pointer hover:scale-110 transition-transform">2</div>
+                                    <div className="mt-4 glass-dark p-4 rounded-2xl backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 max-w-[200px] text-right">
+                                        <p className="text-[10px] text-white font-medium">"Need more white space around this section."</p>
+                                    </div>
+                                </div>
+
+                                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+                                    <div className="flex items-center gap-3 glass p-2 rounded-xl backdrop-blur-xl border border-white/20">
+                                        <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center text-white font-black text-[10px]">✓</div>
+                                        <span className="text-[10px] font-black text-white tracking-widest uppercase">34 Issues Resolved Today</span>
+                                    </div>
+                                    <div className="flex -space-x-3">
+                                        {[1, 2, 3, 4].map(i => (
+                                            <div key={i} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-lg">
+                                                <img src={`https://i.pravatar.cc/100?u=${i}`} alt="User" />
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
