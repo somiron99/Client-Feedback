@@ -124,16 +124,16 @@ export default function Homepage() {
                         <div className="glass rounded-[3rem] p-4 shadow-3xl shadow-[#4B2182]/20 relative max-w-5xl mx-auto">
                             <div className="bg-gray-900 rounded-[2.5rem] overflow-hidden aspect-[16/10] relative group shadow-inner">
                                 <img
-                                    src="https://images.unsplash.com/photo-1551288049-bbbda536ad0a?auto=format&fit=crop&q=80&w=2426"
-                                    alt="Nice Website Mockup on Laptop"
-                                    className="w-full h-full object-cover opacity-95 group-hover:scale-110 transition-transform duration-[4000ms]"
+                                    src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&q=80&w=2426"
+                                    alt="Vibrant Website Mockup on Laptop"
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[4000ms]"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/40 to-transparent"></div>
+                                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
                                 {/* Simulated Interaction Pins */}
-                                <div className="absolute top-[25%] left-[45%] flex flex-col items-center">
-                                    <div className="w-14 h-14 bg-[#F58220] rounded-[1.25rem] flex items-center justify-center text-white font-black shadow-[0_0_40px_rgba(245,130,32,0.8)] animate-bounce text-xl cursor-pointer hover:scale-110 transition-transform ring-4 ring-white/20">1</div>
-                                    <div className="mt-4 glass-dark p-5 rounded-[1.5rem] backdrop-blur-xl border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-4 group-hover:translate-y-0 max-w-[220px] text-left shadow-2xl">
+                                <div className="absolute top-[20%] left-[30%] flex flex-col items-center">
+                                    <div className="w-14 h-14 bg-[#F58220] rounded-[1.25rem] flex items-center justify-center text-white font-black shadow-[0_15px_35px_rgba(245,130,32,0.6)] animate-bounce text-xl cursor-pointer hover:scale-110 transition-transform ring-4 ring-white">1</div>
+                                    <div className="mt-4 glass-dark p-5 rounded-[1.5rem] backdrop-blur-2xl border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-4 group-hover:translate-y-0 max-w-[220px] text-left shadow-2xl">
                                         <p className="text-[11px] text-white font-black mb-1 flex items-center gap-2">
                                             <span className="w-2 h-2 rounded-full bg-[#F58220]"></span>
                                             Sarah (Lead Designer)
@@ -142,9 +142,9 @@ export default function Homepage() {
                                     </div>
                                 </div>
 
-                                <div className="absolute top-[55%] left-[20%] flex flex-col items-start">
-                                    <div className="w-14 h-14 bg-[#4B2182] rounded-[1.25rem] flex items-center justify-center text-white font-black shadow-[0_0_40px_rgba(75,33,130,0.8)] animate-pulse text-xl cursor-pointer hover:scale-110 transition-transform ring-4 ring-white/20">2</div>
-                                    <div className="mt-4 glass-dark p-5 rounded-[1.5rem] backdrop-blur-xl border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-4 group-hover:translate-x-0 max-w-[220px] text-left shadow-2xl">
+                                <div className="absolute top-[50%] left-[10%] flex flex-col items-start scale-90">
+                                    <div className="w-14 h-14 bg-[#4B2182] rounded-[1.25rem] flex items-center justify-center text-white font-black shadow-[0_15px_35px_rgba(75,33,130,0.6)] animate-pulse text-xl cursor-pointer hover:scale-110 transition-transform ring-4 ring-white">2</div>
+                                    <div className="mt-4 glass-dark p-5 rounded-[1.5rem] backdrop-blur-2xl border border-white/20 opacity-0 group-hover:opacity-100 transition-all duration-700 -translate-x-4 group-hover:translate-x-0 max-w-[220px] text-left shadow-2xl">
                                         <p className="text-[11px] text-white font-black mb-1 flex items-center gap-2">
                                             <span className="w-2 h-2 rounded-full bg-[#4B2182]"></span>
                                             Alex (Developer)
