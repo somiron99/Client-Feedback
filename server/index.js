@@ -119,13 +119,14 @@ app.get('/api/projects', authenticate, async (req, res) => {
     }
 });
 
-// Create Project (requires auth)
-app.post('/api/projects', authenticate, async (req, res) => {
+// Create Project (optional auth for testing or public sandbox)
+app.post('/api/projects', optionalAuth, async (req, res) => {
     try {
         const { url } = req.body;
         if (!url) return res.status(400).send('URL required');
 
-        const project = await db.createProject(url, req.user.id);
+        const userId = req.user?.id || null;
+        const project = await db.createProject(url, userId);
         res.json(project);
     } catch (err) {
         console.error('Error creating project:', err);
@@ -216,6 +217,31 @@ app.put('/api/comments/:id', authenticate, async (req, res) => {
         if (err.message === 'Unauthorized') {
             return res.status(403).json({ error: 'Unauthorized' });
         }
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update Comment Position (optional auth for now, can be restricted later)
+app.patch('/api/comments/:id/position', async (req, res) => {
+    try {
+        const { x, y } = req.body;
+        if (x === undefined || y === undefined) return res.status(400).json({ error: 'X and Y required' });
+
+        const comment = await db.updateCommentPosition(req.params.id, x, y);
+        res.json(comment);
+    } catch (err) {
+        console.error('Error updating comment position:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/api/comments/:id/resolve', async (req, res) => {
+    try {
+        const { resolved } = req.body;
+        const comment = await db.resolveComment(req.params.id, resolved);
+        res.json(comment);
+    } catch (err) {
+        console.error('Error resolving comment:', err);
         res.status(500).json({ error: err.message });
     }
 });

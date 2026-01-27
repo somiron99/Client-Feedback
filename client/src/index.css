@@ -1,9 +1,122 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --color-purple: #4B2182;
+  --color-orange: #F58220;
+}
 
 html,
 body,
 #root {
   height: 100%;
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-jakarta);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply text-[#0F172A] bg-white leading-relaxed;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-black {
+  @apply tracking-[-0.03em];
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(75, 33, 130, 0.05);
+}
+
+.glass-dark {
+  background: rgba(75, 33, 130, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Mesh Gradient Background */
+.mesh-bg {
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(75, 33, 130, 0.1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(245, 130, 32, 0.05) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(75, 33, 130, 0.1) 0, transparent 50%);
+}
+
+.text-brand {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#4B2182] to-[#F58220];
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#4B2182]/10 rounded-full hover:bg-[#F58220]/20 transition-colors;
+}
+
+/* Utility Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out 0s 2;
 }

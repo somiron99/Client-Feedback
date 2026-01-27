@@ -1,13 +1,12 @@
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// User credentials
-const SUPABASE_URL = 'https://dmbvuqygnottbibbtbyt.supabase.co';
-// Using Service Role Key for backend access (allows bypassing RLS if needed, but we also set public policies)
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtYnZ1cXlnbm90dGJpYmJ0Ynl0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTQyMDI2OSwiZXhwIjoyMDg0OTk2MjY5fQ.gHC8TIL-T3m81WhRSu24IdwYADi1a_rFE92Cb_hPLOk';
-
-const JWT_SECRET = 'your-secret-key-change-in-production';
+// Use environment variables for credentials
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -199,7 +198,7 @@ module.exports = {
         const projectOwnerId = project?.owner_id;
 
         // 3. Authorization: Must be comment author OR project owner
-        if (comment.user_id == userId || projectOwnerId == userId) {
+        if (String(comment.user_id) === String(userId) || String(projectOwnerId) === String(userId)) {
             console.log('Authorization successful');
         } else {
             console.warn('Unauthorized delete attempt blocked');
@@ -213,6 +212,30 @@ module.exports = {
 
         if (error) throw error;
         return true;
+    },
+
+    async updateCommentPosition(commentId, x, y) {
+        const { data, error } = await supabase
+            .from('comments')
+            .update({ x, y })
+            .eq('id', commentId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
+    async resolveComment(commentId, resolved) {
+        const { data, error } = await supabase
+            .from('comments')
+            .update({ resolved })
+            .eq('id', commentId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     },
 
     // ===== REPLIES =====

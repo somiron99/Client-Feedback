@@ -6,12 +6,13 @@ import { AuthProvider, useAuth } from './AuthContext';
 const Homepage = lazy(() => import('./Homepage'));
 const Auth = lazy(() => import('./Auth'));
 const Dashboard = lazy(() => import('./Dashboard'));
+const Landing = lazy(() => import('./Landing'));
 const Canvas = lazy(() => import('./Canvas'));
 
 // Loading fallback component
 const PageLoader = () => (
   <div className="flex items-center justify-center h-screen bg-gray-50">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4B2182]"></div>
   </div>
 );
 
@@ -37,7 +38,17 @@ export default function App() {
                 <Dashboard />
               </ProtectedRoute>
             } />
-            <Route path="/project/:id" element={<Canvas />} />
+            <Route path="/landing" element={
+              <ProtectedRoute>
+                <Landing />
+              </ProtectedRoute>
+            } />
+            <Route path="/canvas/:projectId" element={
+              <ProtectedRoute>
+                <Canvas />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
