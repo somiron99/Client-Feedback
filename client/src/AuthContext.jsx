@@ -83,6 +83,35 @@ export const AuthProvider = ({ children }) => {
         return localStorage.getItem('pastel_token');
     };
 
+    const updateProfile = async (updates) => {
+        try {
+            const token = getToken();
+            const response = await fetch('/api/auth/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(updates)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Profile update failed');
+            }
+
+            const data = await response.json();
+            setUser(data.user);
+            localStorage.setItem('pastel_user', JSON.stringify(data.user));
+            if (data.token) {
+                localStorage.setItem('pastel_token', data.token);
+            }
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    };
+
     const value = {
         user,
         loading,
@@ -90,6 +119,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         getToken,
+        updateProfile,
         isAuthenticated: !!user
     };
 

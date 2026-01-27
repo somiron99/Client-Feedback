@@ -57,6 +57,26 @@ module.exports = {
         }
     },
 
+    async updateUser(userId, updates) {
+        const { name, email, password } = updates;
+        const dataToUpdate = {};
+        if (name) dataToUpdate.name = name;
+        if (email) dataToUpdate.email = email;
+        if (password) {
+            dataToUpdate.password = await bcrypt.hash(password, 10);
+        }
+
+        const { data, error } = await supabase
+            .from('users')
+            .update(dataToUpdate)
+            .eq('id', userId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
     // ===== PROJECTS =====
     async createProject(url, userId) {
         const { data, error } = await supabase

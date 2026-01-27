@@ -23,7 +23,7 @@ h2,
 h3,
 h4,
 .font-black {
-  @apply tracking-[-0.03em];
+  @apply tracking-[-0.02em];
 }
 
 /* Glassmorphism Utilities */

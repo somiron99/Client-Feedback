@@ -149,7 +149,7 @@ export default function Canvas() {
             {/* Canvas Top Bar */}
             <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 z-30 shadow-sm">
                 <div className="flex items-center gap-6">
-                    <Link to="/dashboard" className="p-3 bg-gray-50 rounded-xl text-gray-400 hover:text-[#4B2182] transition-colors">
+                    <Link to="/dashboard" aria-label="Go back to dashboard" className="p-3 bg-gray-50 rounded-xl text-gray-400 hover:text-[#4B2182] transition-colors">
                         <ArrowLeft size={18} strokeWidth={2.5} />
                     </Link>
                     <div className="flex items-center gap-4">
@@ -171,6 +171,7 @@ export default function Canvas() {
                         <button
                             key={item.id}
                             onClick={() => setView(item.id)}
+                            aria-label={`Switch to ${item.id} view`}
                             className={`p-3 rounded-xl transition-all ${view === item.id
                                 ? 'bg-[#4B2182] text-white shadow-lg shadow-[#4B2182]/20'
                                 : 'text-gray-400 hover:text-gray-900'
@@ -186,7 +187,7 @@ export default function Canvas() {
                         <Share2 size={16} />
                         Share Workspace
                     </button>
-                    <button className="p-3 bg-gray-900 text-white rounded-xl hover:bg-[#F58220] transition-all transform active:scale-95">
+                    <button aria-label="Settings" className="p-3 bg-gray-900 text-white rounded-xl hover:bg-[#F58220] transition-all transform active:scale-95">
                         <Settings size={18} />
                     </button>
                 </div>
@@ -274,12 +275,14 @@ export default function Canvas() {
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleResolve(c.id); }}
+                                            aria-label={c.resolved ? "Unresolve comment" : "Resolve comment"}
                                             className={`p-2 rounded-lg ${c.resolved ? 'bg-green-100 text-green-600' : 'bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50'}`}
                                         >
                                             <CheckCircle2 size={14} strokeWidth={2.5} />
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDeleteComment(c.id); }}
+                                            aria-label="Delete comment"
                                             className="p-2 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
                                         >
                                             <Trash2 size={14} strokeWidth={2.5} />

@@ -13,7 +13,11 @@ import {
     ArrowRight,
     Monitor,
     SearchIcon,
-    Filter
+    Filter,
+    User,
+    LogOut,
+    Settings,
+    ChevronDown
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
@@ -22,6 +26,7 @@ export default function Dashboard() {
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -86,13 +91,44 @@ export default function Dashboard() {
                     <img src="/logo.png" alt="FlexyPin Logo" className="h-7 group-hover:scale-105 transition-transform" />
                 </Link>
                 <div className="flex items-center gap-6">
-                    <div className="hidden md:flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                        {user?.email || 'Guest Session'}
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            aria-label="User menu"
+                            aria-expanded={isMenuOpen}
+                            className="flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-gray-50 transition-all group"
+                        >
+                            <div className="w-9 h-9 rounded-xl bg-[#4B2182]/5 flex items-center justify-center text-[#4B2182] group-hover:bg-[#4B2182] group-hover:text-white transition-all">
+                                <User size={18} strokeWidth={2.5} />
+                            </div>
+                            <div className="hidden md:flex flex-col items-start leading-none">
+                                <span className="text-[11px] font-black text-gray-900 mb-1">{user?.name || 'User'}</span>
+                                <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Free Plan</span>
+                            </div>
+                            <ChevronDown size={14} className={`text-gray-400 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {isMenuOpen && (
+                            <div className="absolute right-0 mt-3 w-56 glass rounded-3xl p-2 shadow-2xl animate-slide-up border border-white/50">
+                                <Link to="/profile" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-gray-700 hover:bg-[#4B2182]/5 hover:text-[#4B2182] transition-all group">
+                                    <Settings size={16} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform" />
+                                    Account Settings
+                                </Link>
+                                <button
+                                    onClick={() => { logout(); navigate('/auth'); }}
+                                    className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all group"
+                                >
+                                    <LogOut size={16} strokeWidth={2.5} className="group-hover:translate-x-1 transition-transform" />
+                                    Sign Out
+                                </button>
+                            </div>
+                        )}
                     </div>
+
                     <Link
                         to="/landing"
-                        className="w-11 h-11 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-[#4B2182] hover:bg-white hover:shadow-xl transition-all"
+                        aria-label="Create new project"
+                        className="w-11 h-11 rounded-2xl bg-[#4B2182] text-white flex items-center justify-center hover:bg-[#F58220] hover:scale-105 shadow-lg shadow-[#4B2182]/20 active:scale-95 transition-all"
                     >
                         <Plus size={22} strokeWidth={2.5} />
                     </Link>
@@ -168,7 +204,8 @@ export default function Dashboard() {
                                     </div>
                                     <button
                                         onClick={(e) => handleDelete(p.id, e)}
-                                        className="p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                        aria-label="Delete project"
+                                        className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all transform active:scale-90"
                                     >
                                         <Trash2 size={18} />
                                     </button>

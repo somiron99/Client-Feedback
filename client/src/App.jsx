@@ -8,6 +8,7 @@ const Auth = lazy(() => import('./Auth'));
 const Dashboard = lazy(() => import('./Dashboard'));
 const Landing = lazy(() => import('./Landing'));
 const Canvas = lazy(() => import('./Canvas'));
+const Profile = lazy(() => import('./Profile'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -46,6 +47,11 @@ export default function App() {
             <Route path="/canvas/:projectId" element={
               <ProtectedRoute>
                 <Canvas />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             } />
             <Route path="*" element={<Navigate to="/" replace />} />

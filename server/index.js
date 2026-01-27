@@ -106,6 +106,22 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+app.put('/api/auth/profile', authenticate, async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        const updatedUser = await db.updateUser(req.user.id, { name, email, password });
+        const token = db.generateToken(updatedUser);
+
+        res.json({
+            user: { id: updatedUser.id, email: updatedUser.email, name: updatedUser.name },
+            token
+        });
+    } catch (err) {
+        console.error('Profile update error:', err);
+        res.status(500).json({ error: 'Failed to update profile' });
+    }
+});
+
 // ===== PROJECT ROUTES =====
 
 // Get user's projects

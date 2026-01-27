@@ -100,7 +100,7 @@ export default function Homepage() {
                         <span className="text-xs font-black text-[#4B2182] tracking-widest uppercase">Visual Feedback for Teams</span>
                     </div>
 
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-[0.9] mb-8 animate-slide-up [animation-delay:100ms]">
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.9] mb-8 animate-slide-up [animation-delay:100ms]">
                         Turn your website into a <span className="text-[#F58220]">collaborative</span> canvas.
                     </h1>
 
@@ -155,7 +155,7 @@ export default function Homepage() {
                     <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-8">
                         <div className="max-w-xl">
                             <span className="text-[#F58220] font-black text-xs tracking-[0.3em] uppercase mb-6 block">Product Suite</span>
-                            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] text-[#4B2182]">Everything you need to ship faster.</h2>
+                            <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[0.85] text-[#4B2182]">Everything you need to ship faster.</h2>
                         </div>
                         <p className="text-gray-500 font-medium text-lg max-w-sm pb-2 leading-relaxed">
                             FlexyPin bridges the gap between design and development by bringing feedback directly onto the website.
@@ -200,7 +200,7 @@ export default function Homepage() {
             <section id="pricing" className="py-40 px-6 bg-gray-50/50">
                 <div className="max-w-7xl mx-auto text-center">
                     <span className="text-[#F58220] font-black text-xs tracking-[0.3em] uppercase mb-6 block">Clear Pricing</span>
-                    <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none text-[#4B2182] mb-12">Built for teams of all sizes.</h2>
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none text-[#4B2182] mb-12">Built for teams of all sizes.</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
                         {[
                             { name: 'Starter', price: '0', features: ['3 Projects', 'Unlimited Comments', '7-day History'] },
@@ -233,7 +233,7 @@ export default function Homepage() {
             {/* Contact Section */}
             <section id="contact" className="py-40 px-6">
                 <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none text-[#4B2182] mb-8">Let's talk.</h2>
+                    <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none text-[#4B2182] mb-8">Let's talk.</h2>
                     <p className="text-xl text-gray-500 font-medium mb-16">Have questions or need a custom solution? Our team is here to help you ship faster.</p>
                     <div className="glass p-12 rounded-[4rem] text-left">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -267,7 +267,7 @@ export default function Homepage() {
                         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#F58220]/20 to-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
 
                         <div className="relative z-10 max-w-2xl text-white">
-                            <h2 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.9] mb-10">
+                            <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-[0.9] mb-10">
                                 Ready to pin your first <span className="text-[#F58220]">feedback?</span>
                             </h2>
                             <p className="text-xl text-white/70 font-medium mb-12">
