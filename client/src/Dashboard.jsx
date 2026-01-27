@@ -20,6 +20,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import ConfirmModal from './ConfirmModal';
 
 export default function Dashboard() {
     const { user, getToken, logout } = useAuth();
@@ -27,6 +28,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, projectId: null });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -58,9 +60,15 @@ export default function Dashboard() {
     };
 
     const handleDelete = async (id, e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!confirm('Are you sure you want to delete this project?')) return;
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        setConfirmDelete({ isOpen: true, projectId: id });
+    };
+
+    const confirmDeleteProject = async () => {
+        const id = confirmDelete.projectId;
         try {
             const token = getToken();
             const res = await fetch(`/api/projects/${id}`, {
@@ -236,6 +244,16 @@ export default function Dashboard() {
                     </div>
                 )}
             </main>
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                onClose={() => setConfirmDelete({ isOpen: false, projectId: null })}
+                onConfirm={confirmDeleteProject}
+                title="Delete Project?"
+                message="This will permanently remove the project and all associated annotations. This action cannot be undone."
+                type="danger"
+                confirmText="Delete Project"
+            />
         </div>
     );
 }

@@ -54,27 +54,29 @@
         }
         .comment-marker.resolved {
             background: #10B981; /* Green-500 */
-            opacity: 0.8;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            opacity: 0.85;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
             border-color: #ECFDF5;
         }
         .comment-marker.resolved:hover {
             opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
         }
         .comment-marker.resolved::after {
             content: '✓';
             position: absolute;
-            top: -5px; right: -5px;
+            top: -6px; right: -6px;
             background: white;
             color: #10B981;
-            width: 14px; height: 14px;
-            border-radius: 50%;
+            width: 16px; height: 16px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 900;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border: 1px solid #ECFDF5;
         }
 
         .comment-form {
@@ -122,38 +124,43 @@
             gap: 12px;
         }
         .comment-form button {
-            background: #4B2182;
+            background: linear-gradient(135deg, #4B2182 0%, #6D28D9 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 14px;
+            padding: 14px 24px;
+            border-radius: 16px;
             cursor: pointer;
             font-size: 13px;
-            font-weight: 700;
-            transition: all 0.2s;
-            flex: 1;
+            font-weight: 800;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            flex: 2;
             font-family: inherit;
-            box-shadow: 0 10px 15px -3px rgba(75, 33, 130, 0.2);
+            box-shadow: 0 10px 20px -5px rgba(75, 33, 130, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
         .comment-form button:hover {
-            background: #F58220;
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(245, 130, 32, 0.3);
+            background: linear-gradient(135deg, #F58220 0%, #FF9D4D 100%);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 15px 25px -5px rgba(245, 130, 32, 0.4);
         }
         .comment-form button:active {
-            transform: translateY(0);
+            transform: translateY(0) scale(0.98);
         }
         .comment-form button.cancel {
             background: white;
             color: #64748B;
             box-shadow: none;
             border: 1px solid #E2E8F0;
+            flex: 1;
+            text-transform: none;
+            letter-spacing: normal;
         }
         .comment-form button.cancel:hover {
             background: #F8FAFC;
-            color: #1E293B;
-            border-color: #CBD5E1;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            color: #EF4444;
+            border-color: #FEE2E2;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
         }
     `;
     shadow.appendChild(style);
@@ -279,69 +286,8 @@
     });
 
     // --- Interactions ---
+    // Dragging disabled per user request to ensure pins "not moving"
     let isDragging = false;
-    let draggedMarker = null;
-    let startX, startY;
-
-    document.addEventListener('mousedown', (e) => {
-        const marker = e.target.closest('.static-marker');
-        if (marker) {
-            isDragging = true;
-            draggedMarker = marker;
-            startX = e.pageX - parseFloat(marker.style.left);
-            startY = e.pageY - parseFloat(marker.style.top);
-            marker.style.cursor = 'grabbing';
-            e.stopPropagation();
-        }
-    }, true);
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging || !draggedMarker) return;
-
-        const newX = e.pageX - startX;
-        const newY = e.pageY - startY;
-
-        draggedMarker.style.left = newX + 'px';
-        draggedMarker.style.top = newY + 'px';
-    }, true);
-
-    document.addEventListener('mouseup', async (e) => {
-        if (!isDragging || !draggedMarker) return;
-
-        const marker = draggedMarker;
-        isDragging = false;
-        draggedMarker = null;
-        marker.style.cursor = 'pointer';
-
-        // Calculate new percentages relative to current parent element
-        const commentId = marker.dataset.id;
-        const comment = allComments.find(c => String(c.id) === String(commentId));
-        if (!comment) return;
-
-        let xPct, yPct;
-        if (comment.selector && comment.selector !== 'body') {
-            const targetEl = document.querySelector(comment.selector);
-            if (targetEl) {
-                const offset = getOffset(targetEl);
-                xPct = ((parseFloat(marker.style.left) - offset.left) / offset.width) * 100;
-                yPct = ((parseFloat(marker.style.top) - offset.top) / offset.height) * 100;
-            }
-        } else {
-            xPct = (parseFloat(marker.style.left) / document.documentElement.scrollWidth) * 100;
-            yPct = (parseFloat(marker.style.top) / document.documentElement.scrollHeight) * 100;
-        }
-
-        // Update in backend
-        try {
-            await fetch(`${config.serverUrl}/api/comments/${commentId}/position`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ x: xPct, y: yPct })
-            });
-        } catch (e) {
-            console.error('Failed to update marker position', e);
-        }
-    }, true);
 
     document.addEventListener('click', (e) => {
         if (isDragging) return;

@@ -19,9 +19,11 @@ import {
     Zap,
     Tag,
     Trash,
-    Loader2
+    Loader2,
+    Check
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
+import ConfirmModal from './ConfirmModal';
 
 export default function Canvas() {
     const { projectId } = useParams();
@@ -30,6 +32,7 @@ export default function Canvas() {
     const [view, setView] = useState('desktop');
     const [comments, setComments] = useState([]);
     const [activeCommentId, setActiveCommentId] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, commentId: null });
     const [loading, setLoading] = useState(true);
     const [replyText, setReplyText] = useState('');
     const [showResolved, setShowResolved] = useState(true);
@@ -92,8 +95,12 @@ export default function Canvas() {
         }
     };
 
-    const handleDeleteComment = async (commentId) => {
-        if (!confirm('Delete this annotation?')) return;
+    const handleDeleteComment = (commentId) => {
+        setConfirmDelete({ isOpen: true, commentId });
+    };
+
+    const confirmDeleteAnnotation = async () => {
+        const commentId = confirmDelete.commentId;
         try {
             const token = getToken();
             await fetch(`/api/comments/${commentId}`, {
@@ -196,8 +203,8 @@ export default function Canvas() {
             <div className="flex-1 flex overflow-hidden">
 
                 {/* Main Canvas Area */}
-                <div className="flex-1 flex flex-col items-center justify-start p-10 overflow-auto bg-gray-50/50 scrollbar-hide">
-                    <div className={`bg-white shadow-3xl shadow-gray-200/50 rounded-[2.5rem] overflow-hidden transition-all duration-700 ${view === 'desktop' ? 'w-full max-w-7xl h-full' :
+                <div className="flex-1 flex flex-col items-center justify-start p-6 overflow-auto bg-gray-50/50 scrollbar-hide">
+                    <div className={`bg-white shadow-3xl shadow-gray-200/50 rounded-2xl overflow-hidden transition-all duration-700 ${view === 'desktop' ? 'w-full max-w-[1600px] h-full' :
                         view === 'tablet' ? 'w-[768px] h-full' :
                             'w-[375px] h-full'
                         } relative border border-gray-100`}>
@@ -272,20 +279,21 @@ export default function Canvas() {
                                             <span className="text-[10px] font-black text-gray-300 uppercase italic">Just now</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleResolve(c.id); }}
                                             aria-label={c.resolved ? "Unresolve comment" : "Resolve comment"}
-                                            className={`p-2 rounded-lg ${c.resolved ? 'bg-green-100 text-green-600' : 'bg-gray-50 text-gray-400 hover:text-green-600 hover:bg-green-50'}`}
+                                            className={`p-2.5 rounded-xl transition-all hover:scale-110 active:scale-95 ${c.resolved ? 'bg-orange-50 text-[#F58220]' : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
+                                                }`}
                                         >
-                                            <CheckCircle2 size={14} strokeWidth={2.5} />
+                                            {c.resolved ? <CheckCircle2 size={16} strokeWidth={2.5} /> : <Check size={16} strokeWidth={3} />}
                                         </button>
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDeleteComment(c.id); }}
                                             aria-label="Delete comment"
-                                            className="p-2 bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
+                                            className="p-2.5 bg-red-50 text-red-400 hover:text-red-500 hover:bg-red-100 rounded-xl transition-all hover:scale-110 active:scale-95"
                                         >
-                                            <Trash2 size={14} strokeWidth={2.5} />
+                                            <Trash2 size={16} strokeWidth={2.5} />
                                         </button>
                                     </div>
                                 </div>
@@ -337,6 +345,16 @@ export default function Canvas() {
                     </div>
                 </aside>
             </div>
+
+            <ConfirmModal
+                isOpen={confirmDelete.isOpen}
+                onClose={() => setConfirmDelete({ isOpen: false, commentId: null })}
+                onConfirm={confirmDeleteAnnotation}
+                title="Delete Annotation?"
+                message="This will permanently remove this comment and its position on the website. This action cannot be undone."
+                type="danger"
+                confirmText="Delete Annotation"
+            />
         </div>
     );
 }
