@@ -58,12 +58,12 @@ export default function Landing() {
                 <Link to="/" className="flex items-center group">
                     <img src="/logo.png" alt="FlexyPin Logo" className="h-7 group-hover:scale-105 transition-transform" />
                 </Link>
-                <Link to="/auth" className="text-[10px] font-black text-gray-400 hover:text-[#4B2182] transition-colors uppercase tracking-[0.3em]">
+                <Link to="/auth" className="text-[10px] font-black text-gray-400 hover:text-[#4B2182] focus-visible:text-[#4B2182] outline-none transition-colors uppercase tracking-[0.3em]">
                     Sign In
                 </Link>
             </header>
 
-            <main className="flex-1 flex flex-col items-center justify-center px-6">
+            <main id="main-content" className="flex-1 flex flex-col items-center justify-center px-6">
                 <div className="max-w-3xl w-full text-center">
 
                     <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-[#4B2182]/5 border border-[#4B2182]/10 mb-8 animate-slide-up">
@@ -81,13 +81,17 @@ export default function Landing() {
 
                     <form
                         onSubmit={handleSubmit}
+                        role="search"
+                        aria-label="Create a new project"
                         className="relative max-w-2xl mx-auto mb-12 animate-slide-up [animation-delay:300ms]"
                     >
                         <div className="glass rounded-[2.5rem] p-3 flex items-center shadow-3xl shadow-[#4B2182]/10">
                             <div className="w-14 h-14 bg-gray-50 rounded-[1.5rem] flex items-center justify-center text-[#4B2182] mr-4">
-                                <Globe size={24} />
+                                <Globe size={24} aria-hidden="true" />
                             </div>
+                            <label htmlFor="url-input" className="sr-only">Website URL</label>
                             <input
+                                id="url-input"
                                 type="text"
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
@@ -98,7 +102,8 @@ export default function Landing() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="bg-[#4B2182] text-white px-10 py-5 rounded-[2rem] font-black text-lg hover:bg-[#F58220] transition-all transform hover:scale-105 shadow-2xl shadow-[#4B2182]/30 flex items-center gap-3 disabled:opacity-50"
+                                className="bg-[#4B2182] text-white px-10 py-5 rounded-[2rem] font-black text-lg hover:bg-[#F58220] focus-visible:bg-[#F58220] outline-none transition-all transform hover:scale-105 shadow-2xl shadow-[#4B2182]/30 flex items-center gap-3 disabled:opacity-50"
+                                aria-label={isLoading ? "Preparing project" : "Create project"}
                             >
                                 {isLoading ? (
                                     <span className="flex items-center gap-2">
@@ -133,7 +138,7 @@ export default function Landing() {
             </main>
 
             <footer className="p-8 text-center">
-                <Link to="/dashboard" className="text-xs font-black text-[#4B2182] hover:text-[#F58220] uppercase tracking-widest transition-colors mb-4 inline-block">
+                <Link to="/dashboard" className="text-xs font-black text-[#4B2182] hover:text-[#F58220] focus-visible:text-[#F58220] outline-none uppercase tracking-widest transition-colors mb-4 inline-block">
                     Go to Dashboard
                 </Link>
             </footer>

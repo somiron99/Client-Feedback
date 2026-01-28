@@ -5,6 +5,11 @@
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;
   --color-purple: #4B2182;
   --color-orange: #F58220;
+  --color-orange-dark: #D96F1A; /* WCAG AA 4.5+:1 on white */
+}
+
+.skip-link {
+  @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-6 focus:py-3 focus:bg-white focus:text-[#4B2182] focus:border-2 focus:border-[#F58220] focus:rounded-xl focus:shadow-2xl focus:font-bold;
 }
 
 html,

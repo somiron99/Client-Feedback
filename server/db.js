@@ -234,7 +234,18 @@ module.exports = {
         return true;
     },
 
-    async updateCommentPosition(commentId, x, y) {
+    async updateCommentPosition(commentId, userId, x, y) {
+        // First check ownership
+        const { data: comment } = await supabase
+            .from('comments')
+            .select('user_id')
+            .eq('id', commentId)
+            .single();
+
+        if (!comment || comment.user_id !== userId) {
+            throw new Error('Unauthorized');
+        }
+
         const { data, error } = await supabase
             .from('comments')
             .update({ x, y })
@@ -246,7 +257,24 @@ module.exports = {
         return data;
     },
 
-    async resolveComment(commentId, resolved) {
+    async resolveComment(commentId, userId, resolved) {
+        // Authorization: Must be comment author OR project owner
+        const { data: comment, error: commentError } = await supabase
+            .from('comments')
+            .select('*, projects(owner_id)')
+            .eq('id', commentId)
+            .single();
+
+        if (commentError || !comment) throw new Error('Comment not found');
+
+        const projectOwnerId = comment.projects?.owner_id;
+
+        if (comment.user_id === userId || projectOwnerId === userId) {
+            // Authorized
+        } else {
+            throw new Error('Unauthorized');
+        }
+
         const { data, error } = await supabase
             .from('comments')
             .update({ resolved })

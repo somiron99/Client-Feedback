@@ -58,6 +58,13 @@
             box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
             border-color: #ECFDF5;
         }
+        .comment-marker.remote-hover {
+            background: #F58220;
+            box-shadow: 0 0 0 4px rgba(245, 130, 32, 0.4), 0 20px 25px -5px rgba(245, 130, 32, 0.5);
+            transform: translate(-50%, -50%) scale(1.15);
+            z-index: 2147483655;
+            border-color: #4B2182;
+        }
         .comment-marker.resolved:hover {
             opacity: 1;
             transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
@@ -79,6 +86,13 @@
             border: 1px solid #ECFDF5;
         }
 
+        .comment-marker:focus-visible {
+            background: #4B2182;
+            transform: translate(-50%, -50%) scale(1.2);
+            box-shadow: 0 0 0 4px rgba(75, 33, 130, 0.3);
+            outline: none;
+        }
+
         .comment-form {
             position: absolute;
             background: rgba(255, 255, 255, 0.9);
@@ -92,6 +106,9 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             animation: form-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .comment-form:focus-within {
+            border-color: #4B2182/20;
         }
         @keyframes form-slide-up {
             from { opacity: 0; transform: translateY(20px) scale(0.95); }
@@ -138,6 +155,10 @@
             box-shadow: 0 10px 20px -5px rgba(75, 33, 130, 0.3);
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            outline: none;
+        }
+        .comment-form button:focus-visible {
+            box-shadow: 0 0 0 4px rgba(75, 33, 130, 0.4);
         }
         .comment-form button:hover {
             background: linear-gradient(135deg, #F58220 0%, #FF9D4D 100%);
@@ -161,6 +182,10 @@
             color: #EF4444;
             border-color: #FEE2E2;
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
+        }
+        .comment-form button.cancel:focus-visible {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+            border-color: #EF4444;
         }
     `;
     shadow.appendChild(style);
@@ -213,8 +238,14 @@
         comments.forEach((c, index) => {
             const el = document.createElement('div');
             el.className = 'comment-marker static-marker';
+            el.tabIndex = 0;
+            el.setAttribute('role', 'button');
+            el.setAttribute('aria-label', `Annotation ${index + 1}: ${c.text}`);
             if (c.id === activeCommentId) {
                 el.classList.add('active');
+                el.setAttribute('aria-expanded', 'true');
+            } else {
+                el.setAttribute('aria-expanded', 'false');
             }
             if (c.resolved) {
                 el.classList.add('resolved');
@@ -249,13 +280,32 @@
             el.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (isDragging) return;
-                setActive(c.id);
+                toggleMarkerSelection(c.id);
+            });
+
+            el.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleMarkerSelection(c.id);
+                }
+            });
+
+            el.addEventListener('mouseenter', () => {
+                window.parent.postMessage({ type: 'MARKER_HOVER', commentId: c.id, isHovering: true }, '*');
+            });
+
+            el.addEventListener('mouseleave', () => {
+                window.parent.postMessage({ type: 'MARKER_HOVER', commentId: c.id, isHovering: false }, '*');
+            });
+
+            function toggleMarkerSelection(id) {
+                setActive(id);
                 window.parent.postMessage({
                     type: 'MARKER_CLICKED',
                     projectId: config.projectId,
-                    commentId: c.id
+                    commentId: id
                 }, '*');
-            });
+            }
 
             shadow.appendChild(el);
         });
@@ -282,6 +332,34 @@
             if (marker) {
                 marker.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
             }
+        }
+
+        if (e.data.type === 'REMOTE_HOVER') {
+            const marker = Array.from(shadow.querySelectorAll('.static-marker')).find(m => m.dataset.id === e.data.commentId);
+            if (marker) {
+                if (e.data.isHovering) {
+                    marker.classList.add('remote-hover');
+                } else {
+                    marker.classList.remove('remote-hover');
+                }
+            }
+        }
+
+        if (e.data.type === 'COMMENT_ADDED') {
+            loadComments();
+        }
+
+        if (e.data.type === 'COMMENT_UPDATED') {
+            // Update local state and re-render
+            const updated = e.data.comment;
+            allComments = allComments.map(c => c.id === updated.id ? updated : c);
+            renderComments(allComments);
+        }
+
+        if (e.data.type === 'COMMENT_DELETED') {
+            const commentId = e.data.commentId;
+            allComments = allComments.filter(c => c.id !== commentId);
+            renderComments(allComments);
         }
     });
 
@@ -321,21 +399,24 @@
         tempMarker.textContent = '+';
         tempMarker.style.left = pageX + 'px';
         tempMarker.style.top = pageY + 'px';
+        tempMarker.setAttribute('aria-label', 'New annotation marker');
         shadow.appendChild(tempMarker);
 
         tempForm = document.createElement('div');
         tempForm.className = 'comment-form';
+        tempForm.setAttribute('role', 'form');
+        tempForm.setAttribute('aria-label', 'Add new annotation');
         tempForm.style.left = (pageX + 20) + 'px';
         tempForm.style.top = pageY + 'px';
         tempForm.innerHTML = `
-            <div style="font-size: 11px; font-weight: 800; color: #4B2182; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                <div style="width: 8px; height: 8px; background: #F58220; border-radius: 2px;"></div>
+            <div id="form-title" style="font-size: 11px; font-weight: 800; color: #4B2182; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <div style="width: 8px; height: 8px; background: #F58220; border-radius: 2px;" aria-hidden="true"></div>
                 Annotate with FlexyPin
             </div>
-            <textarea placeholder="Write your thoughts..."></textarea>
+            <textarea placeholder="Write your thoughts..." aria-labelledby="form-title"></textarea>
             <div class="comment-form-footer">
-                <button class="cancel" id="cancel-btn">Discard</button>
-                <button id="submit-btn" style="flex: 2;">Post Comment</button>
+                <button class="cancel" id="cancel-btn" aria-label="Discard annotation">Discard</button>
+                <button id="submit-btn" style="flex: 2;" aria-label="Post comment">Post Comment</button>
             </div>
         `;
         shadow.appendChild(tempForm);

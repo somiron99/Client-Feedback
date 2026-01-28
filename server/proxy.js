@@ -9,6 +9,21 @@ async function handleProxy(req, res) {
         return res.status(400).send('Missing url parameter');
     }
 
+    // SSRF Protection: Basic check for internal/reserved IPs
+    try {
+        const parsedUrl = new URL(url);
+        const hostname = parsedUrl.hostname;
+
+        // Blacklist for common internal/reserved addresses
+        const internalPattern = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|169\.254\.)/;
+        if (internalPattern.test(hostname)) {
+            console.warn(`SSRF attempt blocked for: ${url}`);
+            return res.status(403).send('Forbidden: Internal addresses are not allowed');
+        }
+    } catch (e) {
+        return res.status(400).send('Invalid URL');
+    }
+
     try {
         // 1. Fetch the target URL
         const response = await axios.get(url, {

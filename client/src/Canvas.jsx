@@ -24,6 +24,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import ConfirmModal from './ConfirmModal';
+import io from 'socket.io-client';
+
+const socket = io(window.location.origin.replace('3000', '3456')); // Adjust for dev/prod
 
 export default function Canvas() {
     const { projectId } = useParams();
@@ -32,6 +35,7 @@ export default function Canvas() {
     const [view, setView] = useState('desktop');
     const [comments, setComments] = useState([]);
     const [activeCommentId, setActiveCommentId] = useState(null);
+    const [remoteHoveredComment, setRemoteHoveredComment] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState({ isOpen: false, commentId: null });
     const [loading, setLoading] = useState(true);
     const [replyText, setReplyText] = useState('');
@@ -41,8 +45,51 @@ export default function Canvas() {
         fetchProject();
         fetchComments();
 
+        // Socket.io integration
+        socket.emit('join_project', projectId);
+
+        socket.on('comment_added', (newComment) => {
+            setComments(prev => [...prev, newComment]);
+            // Notify iframe
+            const iframe = document.querySelector('iframe');
+            if (iframe) iframe.contentWindow.postMessage({ type: 'COMMENT_ADDED' }, '*');
+        });
+
+        socket.on('comment_updated', (updatedComment) => {
+            setComments(prev => prev.map(c => c.id === updatedComment.id ? updatedComment : c));
+            // Notify iframe if marker moved or resolved
+            const iframe = document.querySelector('iframe');
+            if (iframe) iframe.contentWindow.postMessage({ type: 'COMMENT_UPDATED', comment: updatedComment }, '*');
+        });
+
+        socket.on('comment_deleted', (commentId) => {
+            setComments(prev => prev.filter(c => c.id !== commentId));
+            if (activeCommentId === commentId) setActiveCommentId(null);
+            // Notify iframe
+            const iframe = document.querySelector('iframe');
+            if (iframe) iframe.contentWindow.postMessage({ type: 'COMMENT_DELETED', commentId }, '*');
+        });
+
+        socket.on('reply_added', (newReply) => {
+            setComments(prev => prev.map(c => {
+                if (c.id === newReply.comment_id) {
+                    return { ...c, replies: [...(c.replies || []), newReply] };
+                }
+                return c;
+            }));
+        });
+
+        socket.on('comment_hovered', ({ commentId, isHovering }) => {
+            setRemoteHoveredComment(isHovering ? commentId : null);
+            // Notify iframe
+            const iframe = document.querySelector('iframe');
+            if (iframe) iframe.contentWindow.postMessage({ type: 'REMOTE_HOVER', commentId, isHovering }, '*');
+        });
+
         const handleMessage = (event) => {
             if (event.data.type === 'COMMENT_ADDED') {
+                // Actually now handled by socket, but we keep this for local feedback if needed
+                // or just rely on socket.
                 fetchComments();
             }
             if (event.data.type === 'MARKER_CLICKED') {
@@ -50,10 +97,19 @@ export default function Canvas() {
                 const el = document.getElementById(`comment-${event.data.commentId}`);
                 if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
+            if (event.data.type === 'MARKER_HOVER') {
+                socket.emit('hover_comment', { projectId, commentId: event.data.commentId, isHovering: event.data.isHovering });
+            }
         };
 
         window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
+        return () => {
+            window.removeEventListener('message', handleMessage);
+            socket.off('comment_added');
+            socket.off('comment_updated');
+            socket.off('comment_deleted');
+            socket.off('reply_added');
+        };
     }, [projectId]);
 
     const fetchProject = async () => {
@@ -151,12 +207,12 @@ export default function Canvas() {
     );
 
     return (
-        <div className="h-screen w-screen bg-[#F8FAFC] flex flex-col font-jakarta overflow-hidden">
+        <div id="main-content" className="h-screen w-screen bg-[#F8FAFC] flex flex-col font-jakarta overflow-hidden">
 
             {/* Canvas Top Bar */}
             <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 z-30 shadow-sm">
                 <div className="flex items-center gap-6">
-                    <Link to="/dashboard" aria-label="Go back to dashboard" className="p-3 bg-gray-50 rounded-xl text-gray-400 hover:text-[#4B2182] transition-colors">
+                    <Link to="/dashboard" aria-label="Go back to dashboard" className="p-3 bg-gray-50 rounded-xl text-gray-400 hover:text-[#4B2182] transition-colors focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none">
                         <ArrowLeft size={18} strokeWidth={2.5} />
                     </Link>
                     <div className="flex items-center gap-4">
@@ -179,7 +235,7 @@ export default function Canvas() {
                             key={item.id}
                             onClick={() => setView(item.id)}
                             aria-label={`Switch to ${item.id} view`}
-                            className={`p-3 rounded-xl transition-all ${view === item.id
+                            className={`p-3 rounded-xl transition-all focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none ${view === item.id
                                 ? 'bg-[#4B2182] text-white shadow-lg shadow-[#4B2182]/20'
                                 : 'text-gray-400 hover:text-gray-900'
                                 }`}
@@ -190,11 +246,11 @@ export default function Canvas() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <button className="hidden sm:flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-500 hover:text-[#4B2182] transition-colors">
+                    <button className="hidden sm:flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-500 hover:text-[#4B2182] transition-colors focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none">
                         <Share2 size={16} />
                         Share Workspace
                     </button>
-                    <button aria-label="Settings" className="p-3 bg-gray-900 text-white rounded-xl hover:bg-[#F58220] transition-all transform active:scale-95">
+                    <button aria-label="Settings" className="p-3 bg-gray-900 text-white rounded-xl hover:bg-[#F58220] transition-all transform active:scale-95 focus-visible:ring-2 focus-visible:ring-gray-900 outline-none">
                         <Settings size={18} />
                     </button>
                 </div>
@@ -241,11 +297,12 @@ export default function Canvas() {
                         </div>
 
                         <div className="relative group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={16} />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={16} aria-hidden="true" />
                             <input
                                 type="text"
                                 placeholder="Search annotations..."
-                                className="w-full bg-gray-50/50 border-transparent focus:bg-white focus:border-[#4B2182]/10 rounded-2xl py-3 pl-12 pr-4 text-xs font-bold transition-all outline-none"
+                                aria-label="Search annotations"
+                                className="w-full bg-gray-50/50 border-transparent focus:bg-white focus:border-[#4B2182]/10 rounded-2xl py-3 pl-12 pr-4 text-xs font-bold transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#4B2182]"
                             />
                         </div>
                     </div>
@@ -255,16 +312,18 @@ export default function Canvas() {
                             <div
                                 key={c.id}
                                 id={`comment-${c.id}`}
+                                onMouseEnter={() => socket.emit('hover_comment', { projectId, commentId: c.id, isHovering: true })}
+                                onMouseLeave={() => socket.emit('hover_comment', { projectId, commentId: c.id, isHovering: false })}
                                 onClick={() => {
                                     setActiveCommentId(c.id);
                                     // Message iframe to highlight
                                     const iframe = document.querySelector('iframe');
-                                    iframe.contentWindow.postMessage({ type: 'HIGHLIGHT_COMMENT', commentId: c.id }, '*');
+                                    if (iframe) iframe.contentWindow.postMessage({ type: 'HIGHLIGHT_COMMENT', commentId: c.id }, '*');
                                 }}
                                 className={`group p-6 rounded-3xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${activeCommentId === c.id
                                     ? 'bg-white border-[#4B2182] shadow-xl shadow-[#4B2182]/5'
                                     : 'bg-white border-gray-50 hover:border-gray-100 hover:shadow-lg'
-                                    } ${c.resolved ? 'opacity-50' : ''}`}
+                                    } ${c.resolved ? 'opacity-50' : ''} ${remoteHoveredComment === c.id ? 'ring-2 ring-orange-400 ring-inset bg-orange-50/20' : ''}`}
                             >
                                 {/* Visual Accent */}
                                 <div className={`absolute top-0 left-0 w-1 h-full transition-all ${activeCommentId === c.id ? 'bg-[#4B2182]' : 'bg-gray-100 group-hover:bg-[#4B2182]/20'}`}></div>
@@ -283,7 +342,7 @@ export default function Canvas() {
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleResolve(c.id); }}
                                             aria-label={c.resolved ? "Unresolve comment" : "Resolve comment"}
-                                            className={`p-2.5 rounded-xl transition-all hover:scale-110 active:scale-95 ${c.resolved ? 'bg-orange-50 text-[#F58220]' : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
+                                            className={`p-2.5 rounded-xl transition-all hover:scale-110 active:scale-95 focus-visible:ring-2 focus-visible:ring-green-500 outline-none ${c.resolved ? 'bg-orange-50 text-[#F58220]' : 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white'
                                                 }`}
                                         >
                                             {c.resolved ? <CheckCircle2 size={16} strokeWidth={2.5} /> : <Check size={16} strokeWidth={3} />}
@@ -291,7 +350,7 @@ export default function Canvas() {
                                         <button
                                             onClick={(e) => { e.stopPropagation(); handleDeleteComment(c.id); }}
                                             aria-label="Delete comment"
-                                            className="p-2.5 bg-red-50 text-red-400 hover:text-red-500 hover:bg-red-100 rounded-xl transition-all hover:scale-110 active:scale-95"
+                                            className="p-2.5 bg-red-50 text-red-400 hover:text-red-500 hover:bg-red-100 rounded-xl transition-all hover:scale-110 active:scale-95 focus-visible:ring-2 focus-visible:ring-red-500 outline-none"
                                         >
                                             <Trash2 size={16} strokeWidth={2.5} />
                                         </button>

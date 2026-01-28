@@ -143,7 +143,7 @@ export default function Dashboard() {
                 </div>
             </nav>
 
-            <main className="pt-28 pb-20 max-w-7xl mx-auto px-8">
+            <main id="main-content" className="pt-28 pb-20 max-w-7xl mx-auto px-8">
 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-8">
@@ -167,14 +167,25 @@ export default function Dashboard() {
                         <input
                             type="text"
                             placeholder="Search projects..."
-                            className="w-full bg-gray-50/50 border-transparent focus:bg-white focus:border-[#4B2182]/20 rounded-2xl py-3 pl-12 pr-4 text-sm font-bold placeholder:text-gray-400 transition-all outline-none"
+                            aria-label="Search projects"
+                            className="w-full bg-gray-50/50 border-transparent focus:bg-white focus:border-[#4B2182]/20 rounded-2xl py-3 pl-12 pr-4 text-sm font-bold placeholder:text-gray-400 transition-all outline-none focus-visible:ring-2 focus-visible:ring-[#4B2182]"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="flex items-center gap-2">
-                        <button className="p-3 bg-white shadow-sm border border-gray-100 rounded-xl text-[#4B2182]"><LayoutGrid size={18} /></button>
-                        <button className="p-3 text-gray-400 hover:text-[#4B2182] transition-colors"><List size={18} /></button>
+                        <button
+                            className="p-3 bg-white shadow-sm border border-gray-100 rounded-xl text-[#4B2182] focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none"
+                            aria-label="Switch to grid view"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                        <button
+                            className="p-3 text-gray-400 hover:text-[#4B2182] transition-colors focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none"
+                            aria-label="Switch to list view"
+                        >
+                            <List size={18} />
+                        </button>
                     </div>
                 </div>
 
@@ -212,8 +223,8 @@ export default function Dashboard() {
                                     </div>
                                     <button
                                         onClick={(e) => handleDelete(p.id, e)}
-                                        aria-label="Delete project"
-                                        className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all transform active:scale-90"
+                                        aria-label={`Delete project ${p.url.replace(/^https?:\/\//, '')}`}
+                                        className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all transform active:scale-90 focus-visible:ring-2 focus-visible:ring-red-500 outline-none"
                                     >
                                         <Trash2 size={18} />
                                     </button>

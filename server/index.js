@@ -1,15 +1,36 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const http = require('http');
+const { Server } = require('socket.io');
 const db = require('./db');
 const handleProxy = require('./proxy');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    }
+});
 const PORT = 3456;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Rate limiting middleware
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+    standardHeaders: 'draft-7', // set `RateLimit` and `RateLimit-Policy` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+});
+
+// Apply the rate limiting middleware to all requests.
+app.use('/api/', limiter);
 
 // ===== MIDDLEWARE =====
 
@@ -30,6 +51,24 @@ const authenticate = async (req, res, next) => {
     req.user = user;
     next();
 };
+
+// Socket.io Connection Logic
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    socket.on('join_project', (projectId) => {
+        socket.join(projectId);
+        console.log(`Socket ${socket.id} joined project: ${projectId}`);
+    });
+
+    socket.on('hover_comment', ({ projectId, commentId, isHovering }) => {
+        socket.to(projectId).emit('comment_hovered', { commentId, isHovering, userId: socket.id });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+    });
+});
 
 // Optional auth middleware (for public routes that enhance with user data)
 const optionalAuth = async (req, res, next) => {
@@ -213,6 +252,10 @@ app.post('/api/comments', optionalAuth, async (req, res) => {
             y,
             selector
         });
+
+        // Emit real-time event
+        io.to(projectId).emit('comment_added', comment);
+
         res.json(comment);
     } catch (err) {
         console.error('Error creating comment:', err);
@@ -227,6 +270,10 @@ app.put('/api/comments/:id', authenticate, async (req, res) => {
         if (!text) return res.status(400).json({ error: 'Text required' });
 
         const comment = await db.updateComment(req.params.id, req.user.id, text);
+
+        // Emit real-time event
+        io.to(comment.project_id).emit('comment_updated', comment);
+
         res.json(comment);
     } catch (err) {
         console.error('Error updating comment:', err);
@@ -237,27 +284,41 @@ app.put('/api/comments/:id', authenticate, async (req, res) => {
     }
 });
 
-// Update Comment Position (optional auth for now, can be restricted later)
-app.patch('/api/comments/:id/position', async (req, res) => {
+// Update Comment Position (restricted to owner)
+app.patch('/api/comments/:id/position', authenticate, async (req, res) => {
     try {
         const { x, y } = req.body;
         if (x === undefined || y === undefined) return res.status(400).json({ error: 'X and Y required' });
 
-        const comment = await db.updateCommentPosition(req.params.id, x, y);
+        const comment = await db.updateCommentPosition(req.params.id, req.user.id, x, y);
+
+        // Emit real-time event
+        io.to(comment.project_id).emit('comment_updated', comment);
+
         res.json(comment);
     } catch (err) {
         console.error('Error updating comment position:', err);
+        if (err.message === 'Unauthorized') {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
         res.status(500).json({ error: err.message });
     }
 });
 
-app.patch('/api/comments/:id/resolve', async (req, res) => {
+app.patch('/api/comments/:id/resolve', authenticate, async (req, res) => {
     try {
         const { resolved } = req.body;
-        const comment = await db.resolveComment(req.params.id, resolved);
+        const comment = await db.resolveComment(req.params.id, req.user.id, resolved);
+
+        // Emit real-time event
+        io.to(comment.project_id).emit('comment_updated', comment);
+
         res.json(comment);
     } catch (err) {
         console.error('Error resolving comment:', err);
+        if (err.message === 'Unauthorized') {
+            return res.status(403).json({ error: 'Unauthorized' });
+        }
         res.status(500).json({ error: err.message });
     }
 });
@@ -265,8 +326,12 @@ app.patch('/api/comments/:id/resolve', async (req, res) => {
 // Delete Comment (owner only)
 app.delete('/api/comments/:id', authenticate, async (req, res) => {
     try {
-        console.log(`DELETE request for comment ${req.params.id} from user ${req.user.id}`);
-        await db.deleteComment(req.params.id, req.user.id);
+        const comment = await db.deleteComment(req.params.id, req.user.id);
+
+        if (comment) {
+            io.to(comment.project_id).emit('comment_deleted', req.params.id);
+        }
+
         res.json({ success: true });
     } catch (err) {
         console.error('Error deleting comment:', err);
@@ -303,6 +368,13 @@ app.post('/api/replies', optionalAuth, async (req, res) => {
         const userName = req.user?.name || 'Anonymous';
 
         const reply = await db.createReply({ commentId, userId, userName, text });
+
+        // Get project_id for emission
+        const { data: targetComment } = await db.supabase.from('comments').select('project_id').eq('id', commentId).single();
+        if (targetComment) {
+            io.to(targetComment.project_id).emit('reply_added', { ...reply, project_id: targetComment.project_id });
+        }
+
         res.json(reply);
     } catch (err) {
         console.error('Error creating reply:', err);
@@ -331,7 +403,7 @@ app.get('/proxy', handleProxy);
 module.exports = app;
 
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log(`Server running on http://localhost:${PORT}`);
     });
 }

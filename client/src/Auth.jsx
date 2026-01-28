@@ -89,7 +89,7 @@ export default function Auth() {
             </div>
 
             {/* Right Form Side */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50/50">
+            <div id="main-content" className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50/50">
                 <div className="max-w-md w-full animate-slide-up">
 
                     <div className="lg:hidden flex justify-center mb-12">
@@ -108,7 +108,7 @@ export default function Auth() {
                     </div>
 
                     {error && (
-                        <div className="bg-red-50 border border-red-100 text-red-600 px-6 py-4 rounded-2xl text-sm font-bold mb-8 animate-shake">
+                        <div role="alert" className="bg-red-50 border border-red-100 text-red-600 px-6 py-4 rounded-2xl text-sm font-bold mb-8 animate-shake">
                             {error}
                         </div>
                     )}
@@ -117,12 +117,13 @@ export default function Auth() {
                         <div className="space-y-5">
                             {!isLogin && (
                                 <div className="relative group">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Full Name</label>
+                                    <label htmlFor="full-name" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Full Name</label>
                                     <div className="relative">
-                                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                         <input
+                                            id="full-name"
                                             type="text"
-                                            className="w-full bg-white border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-4.5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none shadow-sm"
+                                            className="w-full bg-white border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-4.5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none shadow-sm focus-visible:ring-[#4B2182]/20"
                                             placeholder="John Doe"
                                             value={name}
                                             onChange={e => setName(e.target.value)}
@@ -133,12 +134,13 @@ export default function Auth() {
                             )}
 
                             <div className="relative group">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Work Email</label>
+                                <label htmlFor="work-email" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Work Email</label>
                                 <div className="relative">
-                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                     <input
+                                        id="work-email"
                                         type="email"
-                                        className="w-full bg-white border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none shadow-sm"
+                                        className="w-full bg-white border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none shadow-sm focus-visible:ring-[#4B2182]/20"
                                         placeholder="name@company.com"
                                         value={email}
                                         onChange={e => setEmail(e.target.value)}
@@ -148,12 +150,13 @@ export default function Auth() {
                             </div>
 
                             <div className="relative group">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Password</label>
+                                <label htmlFor="password" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Password</label>
                                 <div className="relative">
-                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                     <input
+                                        id="password"
                                         type="password"
-                                        className="w-full bg-white border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none shadow-sm"
+                                        className="w-full bg-white border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none shadow-sm focus-visible:ring-[#4B2182]/20"
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={e => setPassword(e.target.value)}
@@ -185,12 +188,20 @@ export default function Auth() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            <button type="button" className="flex items-center justify-center gap-3 bg-white border border-gray-100 py-4.5 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group">
-                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="h-5 group-hover:scale-110 transition-transform" alt="Google" />
+                            <button
+                                type="button"
+                                aria-label="Sign in with Google"
+                                className="flex items-center justify-center gap-3 bg-white border border-gray-100 py-4.5 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none"
+                            >
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="h-5 group-hover:scale-110 transition-transform" alt="" aria-hidden="true" />
                                 <span className="text-[13px] font-black text-gray-700">Google</span>
                             </button>
-                            <button type="button" className="flex items-center justify-center gap-3 bg-white border border-gray-100 py-4.5 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group">
-                                <Github className="h-5 group-hover:scale-110 transition-transform" />
+                            <button
+                                type="button"
+                                aria-label="Sign in with GitHub"
+                                className="flex items-center justify-center gap-3 bg-white border border-gray-100 py-4.5 rounded-2xl hover:bg-gray-50 transition-all shadow-sm group focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none"
+                            >
+                                <Github className="h-5 group-hover:scale-110 transition-transform" aria-hidden="true" />
                                 <span className="text-[13px] font-black text-gray-700">GitHub</span>
                             </button>
                         </div>

@@ -73,23 +73,26 @@ export default function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
                     {/* Sidebar */}
                     <div className="space-y-2">
-                        <button className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl bg-[#4B2182] text-white font-black text-sm transition-all shadow-lg shadow-[#4B2182]/20">
-                            <User size={18} strokeWidth={2.5} />
+                        <button
+                            className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl bg-[#4B2182] text-white font-black text-sm transition-all shadow-lg shadow-[#4B2182]/20 focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none"
+                            aria-current="page"
+                        >
+                            <User size={18} strokeWidth={2.5} aria-hidden="true" />
                             General
                         </button>
-                        <button className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-gray-500 hover:bg-white hover:text-[#4B2182] font-black text-sm transition-all group">
-                            <ShieldCheck size={18} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" />
+                        <button className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-gray-500 hover:bg-white hover:text-[#4B2182] font-black text-sm transition-all group focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none">
+                            <ShieldCheck size={18} strokeWidth={2.5} className="group-hover:scale-110 transition-transform" aria-hidden="true" />
                             Security
                         </button>
                     </div>
 
                     {/* Form */}
-                    <div className="md:col-span-2">
+                    <div id="main-content" className="md:col-span-2">
                         <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 md:p-12 shadow-sm">
                             {status.message && (
-                                <div className={`mb-8 flex items-center gap-3 p-5 rounded-2xl font-bold text-sm animate-slide-up ${status.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
+                                <div role="alert" className={`mb-8 flex items-center gap-3 p-5 rounded-2xl font-bold text-sm animate-slide-up ${status.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
                                     }`}>
-                                    {status.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                                    {status.type === 'success' ? <CheckCircle2 size={18} aria-hidden="true" /> : <AlertCircle size={18} aria-hidden="true" />}
                                     {status.message}
                                 </div>
                             )}
@@ -99,12 +102,13 @@ export default function Profile() {
                                     <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Profile Information</h3>
 
                                     <div className="relative group">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Full Name</label>
+                                        <label htmlFor="full-name" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Full Name</label>
                                         <div className="relative">
-                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                             <input
+                                                id="full-name"
                                                 type="text"
-                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none"
+                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none focus-visible:ring-[#4B2182]/20"
                                                 placeholder="Your name"
                                                 value={name}
                                                 onChange={e => setName(e.target.value)}
@@ -114,12 +118,13 @@ export default function Profile() {
                                     </div>
 
                                     <div className="relative group">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Email Address</label>
+                                        <label htmlFor="email-address" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Email Address</label>
                                         <div className="relative">
-                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                             <input
+                                                id="email-address"
                                                 type="email"
-                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none"
+                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none focus-visible:ring-[#4B2182]/20"
                                                 placeholder="name@company.com"
                                                 value={email}
                                                 onChange={e => setEmail(e.target.value)}
@@ -135,12 +140,13 @@ export default function Profile() {
                                     <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Security</h3>
 
                                     <div className="relative group">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">New Password (Optional)</label>
+                                        <label htmlFor="new-password" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">New Password (Optional)</label>
                                         <div className="relative">
-                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                             <input
+                                                id="new-password"
                                                 type="password"
-                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none"
+                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none focus-visible:ring-[#4B2182]/20"
                                                 placeholder="••••••••"
                                                 value={password}
                                                 onChange={e => setPassword(e.target.value)}
@@ -149,12 +155,13 @@ export default function Profile() {
                                     </div>
 
                                     <div className="relative group">
-                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Confirm New Password</label>
+                                        <label htmlFor="confirm-password" className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2.5 block px-2">Confirm New Password</label>
                                         <div className="relative">
-                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} />
+                                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#4B2182] transition-colors" size={18} strokeWidth={2.5} aria-hidden="true" />
                                             <input
+                                                id="confirm-password"
                                                 type="password"
-                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none"
+                                                className="w-full bg-gray-50/50 border border-gray-100 focus:border-[#4B2182]/20 focus:ring-4 focus:ring-[#4B2182]/5 rounded-2xl py-5 pl-12 pr-4 text-sm font-bold placeholder:text-gray-300 transition-all outline-none focus-visible:ring-[#4B2182]/20"
                                                 placeholder="••••••••"
                                                 value={confirmPassword}
                                                 onChange={e => setConfirmPassword(e.target.value)}

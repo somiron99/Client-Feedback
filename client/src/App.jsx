@@ -30,6 +30,9 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Homepage />} />

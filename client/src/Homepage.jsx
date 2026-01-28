@@ -72,7 +72,12 @@ export default function Homepage() {
                                     </Link>
                                 </>
                             )}
-                            <button className="md:hidden p-2 text-gray-500" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                            <button
+                                className="md:hidden p-2 text-gray-500 focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none"
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                                aria-expanded={isMenuOpen}
+                            >
                                 {isMenuOpen ? <X strokeWidth={2.5} /> : <Menu strokeWidth={2.5} />}
                             </button>
                         </div>
@@ -82,18 +87,22 @@ export default function Homepage() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="fixed inset-0 z-40 bg-white md:hidden pt-32 px-10 animate-fade-in">
+                <div
+                    className="fixed inset-0 z-40 bg-white md:hidden pt-32 px-10 animate-fade-in"
+                    role="navigation"
+                    aria-label="Mobile menu"
+                >
                     <div className="flex flex-col gap-8 text-2xl font-black text-gray-900">
-                        <a href="#">Product</a>
-                        <a href="#">Enterprise</a>
-                        <a href="#">Pricing</a>
-                        <Link to="/landing">Get Started</Link>
+                        <a href="#" className="focus-visible:text-[#4B2182] outline-none">Product</a>
+                        <a href="#" className="focus-visible:text-[#4B2182] outline-none">Enterprise</a>
+                        <a href="#" className="focus-visible:text-[#4B2182] outline-none">Pricing</a>
+                        <Link to="/landing" className="focus-visible:text-[#4B2182] outline-none">Get Started</Link>
                     </div>
                 </div>
             )}
 
             {/* Hero Section */}
-            <section className="relative pt-40 pb-20 overflow-hidden mesh-bg">
+            <section id="main-content" className="relative pt-40 pb-20 overflow-hidden mesh-bg">
                 <div className="max-w-7xl mx-auto px-6 relative z-10 text-center">
                     <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-[#4B2182]/10 bg-white/50 backdrop-blur-sm mb-10 animate-slide-up">
                         <span className="w-2 h-2 rounded-full bg-[#F58220] animate-pulse"></span>
@@ -101,7 +110,7 @@ export default function Homepage() {
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.9] mb-8 animate-slide-up [animation-delay:100ms]">
-                        Turn your website into a <span className="text-[#F58220]">collaborative</span> canvas.
+                        Turn your website into a <span className="text-[#D96F1A]">collaborative</span> canvas.
                     </h1>
 
                     <p className="max-w-2xl mx-auto text-xl font-medium text-gray-500 mb-12 animate-slide-up [animation-delay:200ms]">
@@ -114,7 +123,7 @@ export default function Homepage() {
                             <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                         </Link>
                         <button className="w-full sm:w-auto bg-white text-gray-900 px-10 py-5 rounded-[2rem] text-lg font-black hover:bg-gray-50 transition-all border border-gray-100 flex items-center justify-center gap-3 shadow-xl">
-                            <Play size={20} className="text-[#F58220] fill-current" />
+                            <Play size={20} className="text-[#D96F1A] fill-current" />
                             Watch Demo
                         </button>
                     </div>
