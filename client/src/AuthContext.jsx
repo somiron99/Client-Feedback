@@ -36,8 +36,14 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Signup failed');
+                const text = await response.text();
+                console.error('Signup Error Response:', text);
+                try {
+                    const errorData = JSON.parse(text);
+                    throw new Error(errorData.message || 'Signup failed');
+                } catch (e) {
+                    throw new Error(`Signup failed (Raw: ${text.substring(0, 100)})`);
+                }
             }
 
             const data = await response.json();
@@ -59,8 +65,14 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Login failed');
+                const text = await response.text();
+                console.error('Login Error Response:', text);
+                try {
+                    const errorData = JSON.parse(text);
+                    throw new Error(errorData.message || 'Login failed');
+                } catch (e) {
+                    throw new Error(`Login failed (Raw: ${text.substring(0, 100)})`);
+                }
             }
 
             const data = await response.json();

@@ -231,7 +231,7 @@ module.exports = {
             .eq('id', commentId);
 
         if (error) throw error;
-        return true;
+        return comment;
     },
 
     async updateCommentPosition(commentId, userId, x, y) {
