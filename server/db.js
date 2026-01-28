@@ -8,7 +8,15 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Initialize Supabase. Use placeholders if env vars are missing to prevent process crash on startup.
+const supabase = createClient(
+    SUPABASE_URL || 'https://placeholder.supabase.co',
+    SUPABASE_KEY || 'placeholder'
+);
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('WARNING: SUPABASE_URL or SUPABASE_KEY environment variables are missing.');
+}
 
 module.exports = {
     supabase,
