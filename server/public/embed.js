@@ -449,6 +449,7 @@
     }
 
     async function saveComment(text, x, y, selector) {
+        console.log('FlexyPin: Saving comment...', { text, x, y, selector });
         try {
             const res = await fetch(`${config.serverUrl}/api/comments`, {
                 method: 'POST',
@@ -461,12 +462,25 @@
                     selector
                 })
             });
-            await loadComments();
-            // Get ID of new comment
+
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.message || `Server returned ${res.status}`);
+            }
+
             const data = await res.json();
-            window.parent.postMessage({ type: 'COMMENT_ADDED', projectId: config.projectId, commentId: data.id }, '*');
+            console.log('FlexyPin: Comment saved successfully', data);
+
+            await loadComments();
+
+            window.parent.postMessage({
+                type: 'COMMENT_ADDED',
+                projectId: config.projectId,
+                commentId: data.id
+            }, '*');
         } catch (e) {
-            console.error('Error saving comment', e);
+            console.error('FlexyPin: Error saving comment', e);
+            alert('Failed to save comment. Check console for details.');
         }
     }
 
@@ -478,12 +492,17 @@
 
     let allComments = [];
     async function loadComments() {
+        console.log('FlexyPin: Loading comments for project', config.projectId);
         try {
             const res = await fetch(`${config.serverUrl}/api/comments?projectId=${config.projectId}`);
-            allComments = await res.json();
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+            const data = await res.json();
+            allComments = Array.isArray(data) ? data : [];
+            console.log('FlexyPin: Comments loaded', allComments.length);
             renderComments(allComments);
         } catch (e) {
-            console.error('Failed to load comments', e);
+            console.error('FlexyPin: Failed to load comments', e);
         }
     }
 

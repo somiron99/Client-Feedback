@@ -30,6 +30,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Explicitly serve embed.js to be safe on Vercel
+app.get('/embed.js', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'embed.js'));
+});
+
 // Request logging middleware
 app.use((req, res, next) => {
     const start = Date.now();

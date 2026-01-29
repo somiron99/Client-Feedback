@@ -66,8 +66,15 @@ async function handleProxy(req, res) {
 
             // Inject our embed script
             // Use the current host to determine the server URL
-            const protocol = req.headers['x-forwarded-proto'] || 'http';
+            // We can also inject some global config
+            let protocol = req.headers['x-forwarded-proto'] || 'http';
             const host = req.headers.host;
+
+            // On Vercel, always prefer https if it's not localhost
+            if (process.env.VERCEL && !host.includes('localhost')) {
+                protocol = 'https';
+            }
+
             const serverUrl = `${protocol}://${host}`;
             const scriptUrl = `${serverUrl}/embed.js`;
 
