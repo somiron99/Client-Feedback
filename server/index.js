@@ -9,13 +9,22 @@ const handleProxy = require('./proxy');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+
+let io;
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+    try {
+        io = new Server(server, {
+            cors: {
+                origin: "*",
+                methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+            }
+        });
+    } catch (err) {
+        console.warn('Socket.io failed to initialize:', err.message);
     }
-});
-const PORT = 3456;
+}
+
+const PORT = process.env.PORT || 3456;
 
 app.use(cors());
 app.use(express.json());
@@ -76,22 +85,24 @@ const authenticate = async (req, res, next) => {
 };
 
 // Socket.io Connection Logic
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
+if (io) {
+    io.on('connection', (socket) => {
+        console.log('User connected:', socket.id);
 
-    socket.on('join_project', (projectId) => {
-        socket.join(projectId);
-        console.log(`Socket ${socket.id} joined project: ${projectId}`);
-    });
+        socket.on('join_project', (projectId) => {
+            socket.join(projectId);
+            console.log(`Socket ${socket.id} joined project: ${projectId}`);
+        });
 
-    socket.on('hover_comment', ({ projectId, commentId, isHovering }) => {
-        socket.to(projectId).emit('comment_hovered', { commentId, isHovering, userId: socket.id });
-    });
+        socket.on('hover_comment', ({ projectId, commentId, isHovering }) => {
+            socket.to(projectId).emit('comment_hovered', { commentId, isHovering, userId: socket.id });
+        });
 
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
+        socket.on('disconnect', () => {
+            console.log('User disconnected:', socket.id);
+        });
     });
-});
+}
 
 // Optional auth middleware (for public routes that enhance with user data)
 const optionalAuth = async (req, res, next) => {
@@ -277,7 +288,7 @@ app.post('/api/comments', optionalAuth, async (req, res) => {
         });
 
         // Emit real-time event
-        io.to(projectId).emit('comment_added', comment);
+        if (io) io.to(projectId).emit('comment_added', comment);
 
         res.json(comment);
     } catch (err) {
@@ -295,7 +306,7 @@ app.put('/api/comments/:id', authenticate, async (req, res) => {
         const comment = await db.updateComment(req.params.id, req.user.id, text);
 
         // Emit real-time event
-        io.to(comment.project_id).emit('comment_updated', comment);
+        if (io) io.to(comment.project_id).emit('comment_updated', comment);
 
         res.json(comment);
     } catch (err) {
@@ -316,7 +327,7 @@ app.patch('/api/comments/:id/position', authenticate, async (req, res) => {
         const comment = await db.updateCommentPosition(req.params.id, req.user.id, x, y);
 
         // Emit real-time event
-        io.to(comment.project_id).emit('comment_updated', comment);
+        if (io) io.to(comment.project_id).emit('comment_updated', comment);
 
         res.json(comment);
     } catch (err) {
@@ -334,7 +345,7 @@ app.patch('/api/comments/:id/resolve', authenticate, async (req, res) => {
         const comment = await db.resolveComment(req.params.id, req.user.id, resolved);
 
         // Emit real-time event
-        io.to(comment.project_id).emit('comment_updated', comment);
+        if (io) io.to(comment.project_id).emit('comment_updated', comment);
 
         res.json(comment);
     } catch (err) {
@@ -351,7 +362,7 @@ app.delete('/api/comments/:id', authenticate, async (req, res) => {
     try {
         const comment = await db.deleteComment(req.params.id, req.user.id);
 
-        if (comment) {
+        if (comment && io) {
             io.to(comment.project_id).emit('comment_deleted', req.params.id);
         }
 
@@ -394,7 +405,7 @@ app.post('/api/replies', optionalAuth, async (req, res) => {
 
         // Get project_id for emission
         const { data: targetComment } = await db.supabase.from('comments').select('project_id').eq('id', commentId).single();
-        if (targetComment) {
+        if (targetComment && io) {
             io.to(targetComment.project_id).emit('reply_added', { ...reply, project_id: targetComment.project_id });
         }
 

@@ -1,5 +1,7 @@
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
+try {
+    require('dotenv').config({ path: path.join(__dirname, '.env') });
+} catch (e) { }
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
