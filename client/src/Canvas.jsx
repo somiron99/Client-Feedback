@@ -26,7 +26,9 @@ import { useAuth } from './AuthContext';
 import ConfirmModal from './ConfirmModal';
 import io from 'socket.io-client';
 
-const socket = io(window.location.origin.replace('3000', '3456')); // Adjust for dev/prod
+// Use current origin for socket connection. Vite proxy handles /socket.io in dev, 
+// and in prod it's the same host.
+const socket = io(window.location.origin);
 
 export default function Canvas() {
     const { projectId } = useParams();

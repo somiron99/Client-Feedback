@@ -108,8 +108,14 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Profile update failed');
+                const text = await response.text();
+                console.error('Profile Update Error Response:', text);
+                try {
+                    const errorData = JSON.parse(text);
+                    throw new Error(errorData.message || errorData.error || 'Profile update failed');
+                } catch (e) {
+                    throw new Error(`Profile update failed (Raw: ${text.substring(0, 100)})`);
+                }
             }
 
             const data = await response.json();

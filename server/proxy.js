@@ -6,7 +6,7 @@ async function handleProxy(req, res) {
     const projectId = req.query.projectId; // Pass this to the embed script
 
     if (!url) {
-        return res.status(400).send('Missing url parameter');
+        return res.status(400).json({ error: 'Missing url parameter' });
     }
 
     // SSRF Protection: Basic check for internal/reserved IPs
@@ -18,10 +18,10 @@ async function handleProxy(req, res) {
         const internalPattern = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|169\.254\.)/;
         if (internalPattern.test(hostname)) {
             console.warn(`SSRF attempt blocked for: ${url}`);
-            return res.status(403).send('Forbidden: Internal addresses are not allowed');
+            return res.status(403).json({ error: 'Forbidden: Internal addresses are not allowed' });
         }
     } catch (e) {
-        return res.status(400).send('Invalid URL');
+        return res.status(400).json({ error: 'Invalid URL' });
     }
 
     try {

@@ -31,35 +31,48 @@ app.use((req, res, next) => {
     next();
 });
 
-// Rate limiting middleware
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-    standardHeaders: 'draft-7', // set `RateLimit` and `RateLimit-Policy` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+// Configure rate limiter to return JSON
+const rateLimitHandler = (req, res, next, options) => {
+    res.status(options.statusCode).json({
+        error: 'Too many requests',
+        message: options.message
+    });
+};
+
+// API Rate Limiter
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 100,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    handler: rateLimitHandler
 });
 
-// Apply the rate limiting middleware to all requests.
-app.use('/api/', limiter);
+app.use('/api/', apiLimiter);
 
 // ===== MIDDLEWARE =====
 
 // Auth middleware
 const authenticate = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Unauthorized' });
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ error: 'Unauthorized', message: 'No token provided' });
+        }
+
+        const token = authHeader.substring(7);
+        const user = db.verifyToken(token);
+
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid token', message: 'Your session has expired or is invalid' });
+        }
+
+        req.user = user;
+        next();
+    } catch (err) {
+        console.error('Auth Middleware Error:', err);
+        res.status(401).json({ error: 'Unauthorized', message: 'Authentication failed' });
     }
-
-    const token = authHeader.substring(7);
-    const user = db.verifyToken(token);
-
-    if (!user) {
-        return res.status(401).json({ error: 'Invalid token' });
-    }
-
-    req.user = user;
-    next();
 };
 
 // Socket.io Connection Logic
@@ -188,7 +201,7 @@ app.get('/api/projects', authenticate, async (req, res) => {
 app.post('/api/projects', optionalAuth, async (req, res) => {
     try {
         const { url } = req.body;
-        if (!url) return res.status(400).send('URL required');
+        if (!url) return res.status(400).json({ error: 'URL required' });
 
         const userId = req.user?.id || null;
         const project = await db.createProject(url, userId);
@@ -203,11 +216,11 @@ app.post('/api/projects', optionalAuth, async (req, res) => {
 app.get('/api/projects/:id', async (req, res) => {
     try {
         const project = await db.getProject(req.params.id);
-        if (!project) return res.status(404).send('Not found');
+        if (!project) return res.status(404).json({ error: 'Not found' });
         res.json(project);
     } catch (err) {
         if (err.code === 'PGRST116') {
-            return res.status(404).send('Not found');
+            return res.status(404).json({ error: 'Not found' });
         }
         console.error('Error fetching project:', err);
         res.status(500).json({ error: err.message });
@@ -234,7 +247,7 @@ app.delete('/api/projects/:id', authenticate, async (req, res) => {
 app.get('/api/comments', async (req, res) => {
     try {
         const { projectId } = req.query;
-        if (!projectId) return res.status(400).send('ProjectId required');
+        if (!projectId) return res.status(400).json({ error: 'ProjectId required' });
 
         const comments = await db.getComments(projectId);
         res.json(comments);
@@ -358,7 +371,7 @@ app.delete('/api/comments/:id', authenticate, async (req, res) => {
 app.get('/api/replies', async (req, res) => {
     try {
         const { commentId } = req.query;
-        if (!commentId) return res.status(400).send('CommentId required');
+        if (!commentId) return res.status(400).json({ error: 'CommentId required' });
 
         const replies = await db.getReplies(commentId);
         res.json(replies);

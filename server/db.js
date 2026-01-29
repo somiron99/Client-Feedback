@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const { createClient } = require('@supabase/supabase-js');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -6,9 +7,9 @@ const jwt = require('jsonwebtoken');
 // Use environment variables for credentials
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-use-env-in-prod';
 
-// Initialize Supabase. Use placeholders if env vars are missing to prevent process crash on startup.
+// Initialize Supabase.
 const supabase = createClient(
     SUPABASE_URL || 'https://placeholder.supabase.co',
     SUPABASE_KEY || 'placeholder'
