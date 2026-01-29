@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
     Plus,
     ExternalLink,
@@ -92,6 +93,10 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] font-jakarta">
+            <Helmet>
+                <title>Dashboard | FlexyPin</title>
+                <meta name="robots" content="noindex, nofollow" />
+            </Helmet>
 
             {/* Sidebar / Top Nav */}
             <nav className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between shadow-sm">

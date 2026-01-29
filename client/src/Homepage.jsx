@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
     MessageSquare,
     MousePointer2,
@@ -35,6 +36,14 @@ export default function Homepage() {
 
     return (
         <div className="min-h-screen bg-white font-jakarta selection:bg-[#F58220]/20 text-[#0F172A]">
+            <Helmet>
+                <title>FlexyPin - Visual Feedback & Collaboration Tool</title>
+                <meta name="description" content="FlexyPin is the ultimate visual feedback tool. Annotate websites, share workspaces, and streamline your review process with real-time sync." />
+                <link rel="canonical" href="https://flexypin.com/" />
+                <meta property="og:title" content="FlexyPin - Visual Feedback & Collaboration Tool" />
+                <meta property="og:description" content="Streamline your design reviews with FlexyPin. Annotate any website and collaborate in real-time." />
+                <meta property="og:url" content="https://flexypin.com/" />
+            </Helmet>
 
             {/* Navigation */}
             <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'py-4' : 'py-8'}`}>

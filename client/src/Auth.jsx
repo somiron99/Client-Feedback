@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
     Mail,
     Lock,
@@ -49,6 +50,10 @@ export default function Auth() {
 
     return (
         <div className="min-h-screen bg-white font-jakarta flex overflow-hidden">
+            <Helmet>
+                <title>{isLogin ? 'Login' : 'Sign Up'} | FlexyPin</title>
+                <meta name="description" content={isLogin ? 'Login to your FlexyPin account to manage your projects and feedback.' : 'Create a free FlexyPin account and start collaborating on your websites today.'} />
+            </Helmet>
 
             {/* Left Design Side */}
             <div className="hidden lg:flex w-1/2 bg-[#4B2182] relative flex-col justify-between p-20 overflow-hidden">
