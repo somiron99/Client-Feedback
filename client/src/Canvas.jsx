@@ -42,6 +42,15 @@ export default function Canvas() {
     const [loading, setLoading] = useState(true);
     const [replyText, setReplyText] = useState('');
     const [showResolved, setShowResolved] = useState(true);
+    const [isCommentMode, setIsCommentMode] = useState(true);
+
+    useEffect(() => {
+        // Notify iframe about mode change
+        const iframe = document.querySelector('iframe');
+        if (iframe) {
+            iframe.contentWindow.postMessage({ type: 'TOGGLE_MODE', isCommentMode }, '*');
+        }
+    }, [isCommentMode]);
 
     useEffect(() => {
         fetchProject();
@@ -248,6 +257,13 @@ export default function Canvas() {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setIsCommentMode(!isCommentMode)}
+                        className={`hidden sm:flex items-center gap-2 px-6 py-3 border rounded-xl text-xs font-black transition-all transform active:scale-95 focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none ${isCommentMode ? 'bg-[#F58220] border-[#F58220] text-white shadow-lg shadow-[#F58220]/20' : 'bg-white border-gray-100 text-gray-400 hover:text-[#4B2182]'}`}
+                    >
+                        <Zap size={16} className={isCommentMode ? 'animate-pulse' : ''} />
+                        {isCommentMode ? 'Comment Mode: ON' : 'Comment Mode: OFF'}
+                    </button>
                     <button className="hidden sm:flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-xl text-xs font-black text-gray-500 hover:text-[#4B2182] transition-colors focus-visible:ring-2 focus-visible:ring-[#4B2182] outline-none">
                         <Share2 size={16} />
                         Share Workspace

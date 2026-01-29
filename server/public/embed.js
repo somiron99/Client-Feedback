@@ -194,6 +194,7 @@
     let tempMarker = null;
     let tempForm = null;
     let activeCommentId = null;
+    let isCommentMode = true; // Default to on
 
     // --- Helper: Generate Unique CSS Selector ---
     function getCssPath(el) {
@@ -361,6 +362,12 @@
             allComments = allComments.filter(c => c.id !== commentId);
             renderComments(allComments);
         }
+
+        if (e.data.type === 'TOGGLE_MODE') {
+            isCommentMode = e.data.isCommentMode;
+            console.log('FlexyPin: Mode changed', isCommentMode ? 'COMMENT' : 'BROWSE');
+            if (!isCommentMode) closeForm();
+        }
     });
 
     // --- Interactions ---
@@ -368,9 +375,12 @@
     let isDragging = false;
 
     document.addEventListener('click', (e) => {
+        if (!isCommentMode) return; // Ignore if browsing
         if (isDragging) return;
         if (container.contains(e.target)) return;
-        if (e.target.closest('.static-marker')) return; // handled by marker click
+        if (e.target.closest('.static-marker')) return;
+
+        // Prevent default but ONLY if we are in comment mode and clicking a link
         if (e.target.closest('a')) e.preventDefault();
 
         const targetEl = e.target;

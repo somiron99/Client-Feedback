@@ -27,13 +27,13 @@ async function handleProxy(req, res) {
     try {
         // 1. Fetch the target URL
         const response = await axios.get(url, {
-            responseType: 'arraybuffer', // Get raw buffer to handle encoding if needed, or just text.
-            // Text is safer for cheerio
+            responseType: 'arraybuffer',
             responseType: 'text',
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             },
-            validateStatus: () => true // Don't throw on error status
+            timeout: 10000, // 10s timeout
+            validateStatus: () => true
         });
 
         const contentType = response.headers['content-type'] || '';
